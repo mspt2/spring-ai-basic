@@ -21,7 +21,7 @@ public class DataServiceImpl implements DataService {
     private final CSVReader csvReader;
     private final ExecutorService executorService;
 
-    private static final int BATCH_SIZE = 10;
+    private static final int BATCH_SIZE = 5;
     private static final int THREAD_POOL_SIZE = 4;
 
     public DataServiceImpl(VectorStore vectorStore, CSVReader csvReader) {
@@ -59,8 +59,13 @@ public class DataServiceImpl implements DataService {
     }
 
     private void processAndStoreBatch(List<Document> batch) {
-        vectorStore.add(batch);
-
+        try {
+            vectorStore.add(batch);
+            Thread.sleep(1000); // 요청 간 1초 지연
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Processing interrupted", e);
+        }
     }
 
 
